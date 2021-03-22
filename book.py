@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import pandas as pd
 
 class Order:
     def __init__(self, order_type, number, price, order_id):
@@ -8,11 +9,12 @@ class Order:
         self.id = order_id
 
 class Book:
-    def __init__(self, book_name):
+    def __init__(self, book_name, str_print_activate = False):
         self.name = book_name
         self.buys = list()
         self.sells = list()
         self.current_id = 0
+        self.str_print_activate = str_print_activate
 
     def insert_buy(self, number, price):
         self.current_id += 1
@@ -33,14 +35,16 @@ class Book:
     def print_sell(self): 
         self.sells.sort(key = lambda x: x.id)
         self.sells.sort(key = lambda x: x.price, reverse=True)
-        for sell in self.sells:
-            print(f"\t{sell.order_type} {sell.number}@{sell.price} id={sell.id}")
+        if(self.str_print_activate):
+            for sell in self.sells:
+                print(f"\t{sell.order_type} {sell.number}@{sell.price} id={sell.id}")
 
     def print_buy(self):
         self.buys.sort(key = lambda x: x.id)
         self.buys.sort(key = lambda x: x.price, reverse=True)
-        for buy in self.buys:
-            print(f"\t{buy.order_type} {buy.number}@{buy.price} id={buy.id}")
+        if(self.str_print_activate):
+            for buy in self.buys:
+                print(f"\t{buy.order_type} {buy.number}@{buy.price} id={buy.id}")
 
     def remove_buy(self, buy_to_remove):
         for buy in buy_to_remove:
@@ -86,6 +90,17 @@ class Book:
             self.buys.append(order)
         self.remove_sell(sell_to_remove)
 
+    def create_and_print_dataframe(self):
+        order_sells_df = pd.DataFrame([sell.__dict__ for sell in self.sells])
+        if(not order_sells_df.empty):
+            print("\nOrder type : SELL")
+            print(order_sells_df)
+        
+        order_buys_df = pd.DataFrame([buy.__dict__ for buy in self.buys])
+        if(not order_buys_df.empty):
+            print("\nOrder type : BUY")
+            print(order_buys_df)
+
     def print_insert(self, order):
         print(f"--- Insert {order.order_type} {order.number}@{order.price} id={order.id} on {self.name}")
 
@@ -93,6 +108,7 @@ class Book:
         print(f"Book on {self.name}")
         self.print_sell()
         self.print_buy()
-        print("------------------------")
+        self.create_and_print_dataframe()
+        print("------------------------\n")
 
 
